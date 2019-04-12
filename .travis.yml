@@ -1,11 +1,21 @@
 language: node_js
 node_js:
   - "node"
+jdk:
+  - oraclejdk8
+
+addons:
+  sonarcloud:
+    organization: "dimosellaatwork-github"
+
 cache:
   directories:
   - node_modules
+  - '$HOME/.sonar/cache'
+
 install:
   - npm install
+
 script:
   - npm test
-
+  - sonar-scanner
