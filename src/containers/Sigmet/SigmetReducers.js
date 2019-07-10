@@ -780,7 +780,7 @@ const updateSigmet = (dataField, value, container) => {
         : SIGMET_VARIANTS_PREFIXES.NORMAL;
       const activeFirEntry = Object.entries(parameters.firareas).filter((entry) => entry[1].firname === affectedSigmet.firname &&
         entry[1].location_indicator_icao === affectedSigmet.location_indicator_icao);
-      const activeFir = Array.isArray(activeFirEntry) && activeFirEntry.length === 1
+      const activeFir = activeFirEntry.length === 1
         ? activeFirEntry[0][1]
         : null;
       maxHoursDuration = activeFir

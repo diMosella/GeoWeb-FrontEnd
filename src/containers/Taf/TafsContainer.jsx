@@ -35,7 +35,7 @@ export default class TafsContainer extends Component {
     const stageOfTafToShow = tafToShow ? LIFECYCLE_STAGES.find((item) => item.stage === tafToShow.tafData.metadata.type) : null;
     const typeOfTafToShow = stageOfTafToShow ? stageOfTafToShow.label : null;
     const modalEntries = Object.entries(MODALS).filter((modalEntry) => modalEntry[1].type === displayModal);
-    const modalConfig = Array.isArray(modalEntries) && modalEntries.length > 0 ? modalEntries[0][1] : null;
+    const modalConfig = modalEntries.length > 0 ? modalEntries[0][1] : null;
 
     const hasFollowUp = Array.isArray(selectableTafs) && !!tafToShow && selectableTafs.some((selectable) =>
       !!selectable.tafData.metadata.previousUuid && selectable.tafData.metadata.previousUuid === tafToShow.tafData.metadata.uuid);

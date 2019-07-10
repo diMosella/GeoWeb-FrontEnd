@@ -65,7 +65,7 @@ class AirmetsCategory extends PureComponent {
     const prefix = AIRMET_VARIANTS_PREFIXES.NORMAL;
     const activeFirEntry = Object.entries(parameters.firareas).filter((entry) => entry[1].firname === airmetToShow.firname &&
       entry[1].location_indicator_icao === airmetToShow.location_indicator_icao);
-    const activeFir = Array.isArray(activeFirEntry) && activeFirEntry.length === 1
+    const activeFir = activeFirEntry.length === 1
       ? activeFirEntry[0][1]
       : null;
 

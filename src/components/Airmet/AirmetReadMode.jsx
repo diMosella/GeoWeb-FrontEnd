@@ -137,7 +137,7 @@ class AirmetReadMode extends PureComponent {
    */
   getModalConfig (displayModal, uuid, adjacentFirs, moveTo) {
     const modalEntries = Object.entries(MODALS).filter((modalEntry) => modalEntry[1].type === displayModal);
-    return Array.isArray(modalEntries) && modalEntries.length > 0 ? produce(modalEntries[0][1], draftState => {
+    return modalEntries.length > 0 ? produce(modalEntries[0][1], draftState => {
       if (draftState.button) {
         draftState.button.arguments = uuid; /* Used in action dispatch with right arguments */
       }
