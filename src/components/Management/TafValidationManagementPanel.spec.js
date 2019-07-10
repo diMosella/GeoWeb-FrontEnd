@@ -1,5 +1,5 @@
 import React from 'react';
-import { default as TafValidationManagementPanel } from './TafValidationManagementPanel';
+import TafValidationManagementPanel from './TafValidationManagementPanel';
 import { mount } from 'enzyme';
 import moxios from 'moxios';
 

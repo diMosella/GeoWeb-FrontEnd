@@ -5,7 +5,7 @@ import { Button } from 'reactstrap';
 
 const airmet = {
   phenomenon: 'TEST',
-  levelinfo: { levels: [{ unit: 'FL', value: 4 }, { unit: 'M', value: 4 }] },
+  levelinfo: { levels: [{ unit: 'FL', value: 4 }, { unit: 'M', value: 4 }] }
 };
 
 describe('(Component) AirmetMinifiedMode', () => {

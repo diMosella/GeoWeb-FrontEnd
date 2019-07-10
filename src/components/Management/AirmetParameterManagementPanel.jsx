@@ -25,6 +25,12 @@ export default class AirmetParameterManagementPanel extends React.Component {
   }
 }
 
+AirmetParameterManagementPanel.propTypes = {
+  urls: PropTypes.shape({
+    BACKEND_SERVER_URL: PropTypes.string
+  })
+};
+
 export class ParameterMapper extends React.Component {
   /* istanbul ignore next */
   constructor () {

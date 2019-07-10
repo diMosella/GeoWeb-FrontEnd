@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, Button, ButtonGroup, Row, Col, Input, Alert } from 'reactstrap';
+import PropTypes from 'prop-types';
 import Panel from '../Panel';
 import axios from 'axios';
 import JSONTree from 'react-json-tree';
@@ -190,3 +191,9 @@ export default class TafExampleTafManagementPanel extends React.Component {
     );
   }
 }
+
+TafExampleTafManagementPanel.propTypes = {
+  urls: PropTypes.shape({
+    BACKEND_SERVER_URL: PropTypes.string
+  })
+};

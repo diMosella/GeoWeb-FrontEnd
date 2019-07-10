@@ -1,5 +1,5 @@
 import React from 'react';
-import { default as ProgtempManagementPanel } from './ProgtempManagementPanel';
+import ProgtempManagementPanel from './ProgtempManagementPanel';
 import { mount } from 'enzyme';
 
 describe('(Component) ProgtempManagementPanel', () => {

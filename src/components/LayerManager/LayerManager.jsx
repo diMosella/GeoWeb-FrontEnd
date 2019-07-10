@@ -9,7 +9,7 @@ export default class LayerManager extends Component {
     this.makeActiveLayer = this.makeActiveLayer.bind(this);
   }
   makeActiveLayer (index) {
-    const { dispatch, panelsActions, activePanelId, panel } = this.props;
+    const { dispatch, panelsActions, activePanelId } = this.props;
     dispatch(panelsActions.setActiveLayer({ layerClicked: index, activePanelId }));
   }
 

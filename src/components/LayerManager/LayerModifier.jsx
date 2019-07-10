@@ -2,6 +2,8 @@ import React, { PureComponent } from 'react';
 import { Col } from 'reactstrap';
 import { Icon } from 'react-fa';
 import cloneDeep from 'lodash.clonedeep';
+import PropTypes from 'prop-types';
+
 export default class LayerModifier extends PureComponent {
   constructor () {
     super();
@@ -35,3 +37,12 @@ export default class LayerModifier extends PureComponent {
       </Col>);
   }
 }
+
+LayerModifier.propTypes = {
+  dispatch: PropTypes.func,
+  panelsActions: PropTypes.objectOf(PropTypes.func),
+  activePanelId: PropTypes.number,
+  layer: PropTypes.object,
+  role: PropTypes.string,
+  index: PropTypes.number
+};

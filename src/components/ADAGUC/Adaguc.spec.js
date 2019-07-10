@@ -1,5 +1,5 @@
 import React from 'react';
-import { default as Adaguc } from './Adaguc';
+import Adaguc from './Adaguc';
 import reducer from '../../redux/reducers';
 import { shallow } from 'enzyme';
 import sinon from 'sinon';

@@ -26,6 +26,12 @@ export default class SigmetParameterManagementPanel extends React.Component {
   }
 }
 
+SigmetParameterManagementPanel.propTypes = {
+  urls: PropTypes.shape({
+    BACKEND_SERVER_URL: PropTypes.string
+  })
+};
+
 export class ParameterMapper extends React.Component {
   /* istanbul ignore next */
   constructor () {

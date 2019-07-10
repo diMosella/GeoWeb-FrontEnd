@@ -43,7 +43,8 @@ class LocationCardLayout extends PureComponent {
 }
 
 LocationCardLayout.propTypes = {
-  childrenMap: PropTypes.objectOf(PropTypes.element)
+  childrenMap: PropTypes.objectOf(PropTypes.element),
+  className: PropTypes.string
 };
 
 export default withLabeledChildren(LocationCardLayout, 'role');

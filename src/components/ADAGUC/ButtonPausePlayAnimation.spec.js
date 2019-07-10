@@ -1,5 +1,5 @@
 import React from 'react';
-import { default as ButtonPausePlayAnimation } from './ButtonPausePlayAnimation';
+import ButtonPausePlayAnimation from './ButtonPausePlayAnimation';
 import { shallow } from 'enzyme';
 import { Button } from 'reactstrap';
 

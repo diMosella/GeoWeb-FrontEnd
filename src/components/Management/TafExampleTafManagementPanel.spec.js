@@ -1,5 +1,5 @@
 import React from 'react';
-import { default as TafExampleTafManagementPanel } from './TafExampleTafManagementPanel';
+import TafExampleTafManagementPanel from './TafExampleTafManagementPanel';
 import { mount } from 'enzyme';
 import moxios from 'moxios';
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import Panel from '../Panel';
 import { Row, Col, Button } from 'reactstrap';
+import PropTypes from 'prop-types';
 import axios from 'axios';
 import cloneDeep from 'lodash.clonedeep';
 import JSONTree from 'react-json-tree';
@@ -82,3 +83,9 @@ export default class TafValidationManagementPanel extends React.Component {
     );
   }
 }
+
+TafValidationManagementPanel.propTypes = {
+  urls: PropTypes.shape({
+    BACKEND_SERVER_URL: PropTypes.string
+  })
+};

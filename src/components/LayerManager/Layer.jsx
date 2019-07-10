@@ -221,18 +221,18 @@ export default class Layer extends PureComponent {
             e.preventDefault();
             e.stopPropagation();
             layer.WMJSService.getLayerObjectsFlat((layers) => {
-              this.setState({ layerChangerOpen: true, target: 'layer'+ id, serviceLayers: layers });
+              this.setState({ layerChangerOpen: true, target: 'layer' + id, serviceLayers: layers });
             });
           }} active={layer.active} color={color}>{layer.title}</EditableCell>
           <EditableCell id={'style' + id} onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            this.setState({ styleChangerOpen: true, target: 'style'+ id, serviceStyles: styles });
+            this.setState({ styleChangerOpen: true, target: 'style' + id, serviceStyles: styles });
           }} active={layer.active} color={color}>{layer.currentStyle}</EditableCell>
           <EditableCell id={'opacity' + id} onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            this.setState({ opacityChangerOpen: true, target: 'opacity'+id });
+            this.setState({ opacityChangerOpen: true, target: 'opacity' + id });
           }} active={layer.active} color={color}>{parseInt(layer.opacity * 100) + '%'}</EditableCell>
           <ConcreteCell active={layer.active} color={color}>{refTime ? refTime.currentValue : null}</ConcreteCell>
           {this.renderRemainingDimensions(layer, id)}</Col>);
@@ -276,6 +276,17 @@ export class UnsortableLayer extends PureComponent {
       </Row>);
   }
 }
+
+UnsortableLayer.propTypes = {
+  dispatch: PropTypes.func,
+  panelsActions: PropTypes.objectOf(PropTypes.func),
+  activePanelId: PropTypes.number,
+  layer: PropTypes.object,
+  role: PropTypes.string,
+  color: PropTypes.string,
+  layerIndex: PropTypes.number,
+  onLayerClick: PropTypes.func
+};
 
 export const SortableLayer = SortableElement(({ role, color, layer, layerIndex, dispatch, panelsActions, activePanelId, onLayerClick }) => {
   const backgroundColor = role === 'datalayers' && layer.active ? 'rgba(217, 237, 247, 0.6)' : null;

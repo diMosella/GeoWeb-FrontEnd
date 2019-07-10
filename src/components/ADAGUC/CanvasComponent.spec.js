@@ -1,6 +1,6 @@
 import React from 'react';
 // eslint-disable-next-line no-unused-vars
-import { default as CanvasComponent } from './CanvasComponent';
+import CanvasComponent from './CanvasComponent';
 import { shallow } from 'enzyme';
 
 describe('(Component) CanvasComponent', () => {

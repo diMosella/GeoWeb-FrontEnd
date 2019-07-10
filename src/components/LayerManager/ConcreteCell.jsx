@@ -1,5 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Badge } from 'reactstrap';
+import PropTypes from 'prop-types';
+
 export default class ConcreteCell extends PureComponent {
   render () {
     if (this.props.active) {
@@ -9,3 +11,10 @@ export default class ConcreteCell extends PureComponent {
     }
   }
 }
+
+ConcreteCell.propTypes = {
+  active: PropTypes.bool,
+  onClick: PropTypes.func,
+  color: PropTypes.string,
+  children: PropTypes.array
+};

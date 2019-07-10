@@ -1,5 +1,5 @@
 import React from 'react';
-import { default as LocationManagementPanel, LocationMapper } from './LocationManagementPanel';
+import LocationManagementPanel, { LocationMapper } from './LocationManagementPanel';
 import { mount, shallow } from 'enzyme';
 import moxios from 'moxios';
 

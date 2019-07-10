@@ -1,5 +1,5 @@
 import React from 'react';
-import { default as TafLocationsManagementPanel } from './TafLocationsManagementPanel';
+import TafLocationsManagementPanel from './TafLocationsManagementPanel';
 import { mount } from 'enzyme';
 import moxios from 'moxios';
 

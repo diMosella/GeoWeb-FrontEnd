@@ -1,5 +1,5 @@
 import React from 'react';
-import { default as LayerManager } from './LayerManager';
+import LayerManager from './LayerManager';
 import { shallow, mount } from 'enzyme';
 import { Col } from 'reactstrap';
 import { panel } from './TestPanel.json';

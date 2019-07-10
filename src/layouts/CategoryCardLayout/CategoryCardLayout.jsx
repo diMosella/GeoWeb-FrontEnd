@@ -32,7 +32,8 @@ class CategoryCardLayout extends PureComponent {
 }
 
 CategoryCardLayout.propTypes = {
-  childrenMap: PropTypes.objectOf(PropTypes.element)
+  childrenMap: PropTypes.objectOf(PropTypes.element),
+  className: PropTypes.string
 };
 
 export default withLabeledChildren(CategoryCardLayout, 'role');

@@ -43,14 +43,14 @@ export default class SidebarContainer extends React.Component {
       <Panel className='ManageSideContainer'>
         {items.map((item, i) => {
           return item.disabled
-          ? <Button key={i} color='primary' className='row' title={item.title} disabled><Icon name={item.icon} /></Button>
-          : <Link to={'manage/' + item.link} key={item.key} style={{ color: 'inherit', marginBottom: '0.33rem' }} >
-            <Button key={i} color='primary' className='row' title={item.title} disabled={item.disabled === true} style={{ width: '3rem' }}>
-              <Icon name={item.icon} />
-            </Button>
-          </Link>;
+            ? <Button key={i} color='primary' className='row' title={item.title} disabled><Icon name={item.icon} /></Button>
+            : <Link to={'manage/' + item.link} key={item.key} style={{ color: 'inherit', marginBottom: '0.33rem' }} >
+              <Button key={i} color='primary' className='row' title={item.title} disabled={item.disabled === true} style={{ width: '3rem' }}>
+                <Icon name={item.icon} />
+              </Button>
+            </Link>;
         })
-      }
+        }
       </Panel>);
   }
 }
