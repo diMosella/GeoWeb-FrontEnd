@@ -338,7 +338,7 @@ const safeMerge = (incomingValues, baseTemplate, existingData = null) => {
           pathPartSolutions.push(solution);
           templateValue = getNestedProperty(baseTemplate, templatePath);
           solutionSpace = getSolutionSpace(templatePath, solutionDimensions, solution.templateValueIndex() + 1);
-        };
+        }
       }
 
       // devise a solution for pointers which exist in the incoming and template structures,
@@ -498,7 +498,7 @@ const clearRecursive = (objectToClear, pathParts) => {
 
   if (isEmptyStructure(cleanedParent)) {
     clearRecursive(objectToClear, pathParts);
-  };
+  }
 };
 
 /**
