@@ -130,12 +130,12 @@ const complementForAdditions = (parentStructure, template, complementKey, pointe
  */
 const filterSolutions = (solutions, path, startIndex, skipTemplateValueCheck = false) =>
   solutions.filter((solution) => solution.incomingValueIndex() < path.length &&
-      solution.incomingValueIndex() >= startIndex &&
-      solution.path.every((part, index) =>
-        (index < solution.incomingValueIndex() && part === path[index]) ||
-        (index === solution.incomingValueIndex() && solution.test(path[index]) &&
-          (skipTemplateValueCheck || part !== path[index]))
-      )
+    solution.incomingValueIndex() >= startIndex &&
+    solution.path.every((part, index) =>
+      (index < solution.incomingValueIndex() && part === path[index]) ||
+      (index === solution.incomingValueIndex() && solution.test(path[index]) &&
+        (skipTemplateValueCheck || part !== path[index]))
+    )
   );
 
 /**
@@ -238,7 +238,7 @@ const safeMerge = (incomingValues, baseTemplate, existingData = null) => {
         },
         rewritePath: (pointerPath) =>
           pointerPath.slice(0, _templateIndex).concat(_key).concat(pointerPath.slice(_templateIndex + 1)),
-        done: () => {}
+        done: () => { }
       };
     })();
   });
@@ -258,7 +258,7 @@ const safeMerge = (incomingValues, baseTemplate, existingData = null) => {
         },
         rewritePath: (pointerPath) =>
           pointerPath.slice(0, _templateIndex).concat(_key).concat(pointerPath.slice(_templateIndex + 1)),
-        done: () => {}
+        done: () => { }
       };
     })();
   });
@@ -287,10 +287,10 @@ const safeMerge = (incomingValues, baseTemplate, existingData = null) => {
           _matchingIndex = downStreamTypes.findIndex((type) =>
             ((type.parent === NODE_TYPES.ARRAY && downStreamPointerPath.length > 0 && _numRegEx.test(downStreamPointerPath[0]) &&
               ((type.child === NODE_TYPES.ARRAY && downStreamPointerPath.length > 1 && _numRegEx.test(downStreamPointerPath[1])) ||
-              (type.child === NODE_TYPES.OBJECT && downStreamPointerPath.length > 1 && !_numRegEx.test(downStreamPointerPath[1])) ||
-              (type.child === NODE_TYPES.LEAF && downStreamPointerPath.length === 1))) ||
-            (type.parent === NODE_TYPES.OBJECT && downStreamPointerPath.length > 0 && !_numRegEx.test(downStreamPointerPath[0])) ||
-            (type.parent === NODE_TYPES.LEAF && downStreamPointerPath.length === 0))
+                (type.child === NODE_TYPES.OBJECT && downStreamPointerPath.length > 1 && !_numRegEx.test(downStreamPointerPath[1])) ||
+                (type.child === NODE_TYPES.LEAF && downStreamPointerPath.length === 1))) ||
+              (type.parent === NODE_TYPES.OBJECT && downStreamPointerPath.length > 0 && !_numRegEx.test(downStreamPointerPath[0])) ||
+              (type.parent === NODE_TYPES.LEAF && downStreamPointerPath.length === 0))
           );
           // allowing for setting empty arrays
           if (_matchingIndex === -1 && downStreamPointerPath.length === 0) {
@@ -528,6 +528,102 @@ const getJsonPointers = (collection, predicate, accumulator, parentPointer = '')
   return predicate(collection, parentPointer) || accumulator;
 };
 
+// TODO: add checks / error handling
+// TODO: add default parameters
+// TODO: pointer only, value only detection, creator with optional args?
+class Visitor {
+  constructor (predicate, terminatePredicate) {
+    this.predicate = predicate;
+    this.terminatePredicate = terminatePredicate;
+  }
+
+  descendants (node) {
+    const keys = Array.isArray(node.value)
+      ? node.value.map((_value, index) => index)
+      : isObject(node.value)
+        ? Object.keys(node.value)
+        : [];
+    const endSlash = node.pointer.endsWith('/') ? '' : '/';
+    return keys.map((key) => ({ pointer: `${node.pointer}${endSlash}${key}`, key }));
+  }
+
+  visit (node = { pointer: '/', value: null }) {
+    const isStop = this.terminatePredicate(node);
+    const descendants = isStop ? [] : this.descendants(node);
+    const isMatch = !isStop && this.predicate(node);
+    return { isStop, isMatch, descendants };
+  };
+}
+
+// TODO: add checks parameters / error handling
+// TODO: add default parameters
+// TODO: escape pointers (for '/')
+// TODO: add wrapping, functional methods (findFirst, ...)
+class Traverser {
+  constructor (value = null, pointer = '/', visitor) {
+    this.node = { pointer, value };
+    this.visitor = visitor;
+  }
+
+  * [Symbol.iterator] () {
+    const status = this.visitor.visit(this.node);
+    if (status.isStop) {
+      return;
+    }
+    if (status.isMatch) {
+      yield this.node;
+    }
+    // TODO: cheaper when there is a specific pointer requirement?
+    for (const subNode of status.descendants) {
+      // short for yield * new Traverser[Symbol.iterator]()
+      yield * new Traverser(this.node.value[subNode.key], subNode.pointer, this.visitor);
+    }
+  }
+}
+
+function * keysOf (node) {
+  const endSlash = node.pointer.endsWith('/') ? '' : '/';
+  const keys = node.value !== null && typeof node.value === 'object'
+    ? Object.keys(node.value)
+    : [];
+
+  for (const key of keys) {
+    yield { pointer: `${node.pointer}${endSlash}${key}`, value: key };
+  }
+}
+
+function * map (iterable, mapper) {
+  for (const item of iterable) {
+    yield * mapper(item);
+  }
+}
+
+function * filter (iterable, predicate) {
+  for (const item of iterable) {
+    if (predicate(item)) {
+      yield item;
+    }
+  }
+}
+
+function * traverse (node) {
+  const { descendants } = yield node;
+  yield * map(descendants, (key) => traverse({ pointer: key.pointer, value: node.value[key.value] }));
+}
+
+const co = (genFunc, predicate, ...args) => {
+  const genObj = genFunc(...args);
+  step(genObj.next());
+
+  function step ({ value, done }) {
+    if (!done) {
+      // console.log('result', value);
+      value.descendants = filter(keysOf(value), predicate);
+      step(genObj.next(value));
+    }
+  }
+};
+
 /**
  * Clear all null values in an object, and clear resulting empty ancestors as well
  * @param  {Object} objectToClear An hierarchical object to clean null values for
@@ -622,6 +718,10 @@ module.exports = {
   removeNestedProperty: removeNestedProperty,
   isFeatureGeoJsonComplete: isFeatureGeoJsonComplete,
   isObject: isObject,
+  Traverser: Traverser,
+  Visitor: Visitor,
+  traverse: traverse,
+  co: co,
   MODES_GEO_SELECTION: MODES_GEO_SELECTION,
   MODES_GEO_MAPPING: MODES_GEO_MAPPING
 };
