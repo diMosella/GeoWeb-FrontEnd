@@ -3,6 +3,7 @@
   "version": "0.55.0",
   "description": "GeoWeb FrontEnd is the platform for the Early Warning Center and Weather Room",
   "main": "index.js",
+  "type": "module",
   "engines": {
     "node": ">=6.4.0",
     "npm": "^3.0.0"

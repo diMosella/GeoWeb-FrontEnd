@@ -6,14 +6,14 @@ import cloneDeep from 'lodash.clonedeep';
 import unsetNestedProperty from 'lodash.unset';
 
 // Modes for geo-location selection
-const MODES_GEO_SELECTION = {
+export const MODES_GEO_SELECTION = {
   POINT: 'point',
   BOX: 'box',
   POLY: 'poly',
   FIR: 'fir'
 };
 
-const MODES_GEO_MAPPING = {
+export const MODES_GEO_MAPPING = {
   [MODES_GEO_SELECTION.POINT]: 'select-point',
   [MODES_GEO_SELECTION.BOX]: 'select-region',
   [MODES_GEO_SELECTION.POLY]: 'select-shape',
@@ -170,7 +170,7 @@ const resetAppliedSolutions = (solutionSpace) => solutionSpace.forEach((solution
  * @param {Object|Array} [existingData=null] - The data structure to use as alternative starting point for the merge
  * @returns {Object|Array} - The data structure template with the incoming values merged
  */
-const safeMerge = (incomingValues, baseTemplate, existingData = null) => {
+export const safeMerge = (incomingValues, baseTemplate, existingData = null) => {
   // input validation
   if (!baseTemplate || (!isObject(baseTemplate) && !Array.isArray(baseTemplate))) {
     throw new Error(`Argument 'baseTemplate' is missing a proper value`);
@@ -509,7 +509,7 @@ const clearRecursive = (objectToClear, pathParts) => {
  * @param  {string} [parentPointer] The parent pointer
  * @return {Array|Boolean} The result of the test, XOR an array with (intermediate) results
  */
-const getJsonPointers = (collection, predicate, accumulator, parentPointer = '') => {
+export const getJsonPointers = (collection, predicate, accumulator, parentPointer = '') => {
   accumulator = accumulator || [];
   const keyList = Array.isArray(collection)
     ? collection.map((item, index) => index)
@@ -531,7 +531,7 @@ const getJsonPointers = (collection, predicate, accumulator, parentPointer = '')
 // TODO: add checks / error handling
 // TODO: add default parameters
 // TODO: pointer only, value only detection, creator with optional args?
-class Visitor {
+export class Visitor {
   constructor (predicate, terminatePredicate) {
     this.predicate = predicate;
     this.terminatePredicate = terminatePredicate;
@@ -559,7 +559,7 @@ class Visitor {
 // TODO: add default parameters
 // TODO: escape pointers (for '/')
 // TODO: add wrapping, functional methods (findFirst, ...)
-class Traverser {
+export class Traverser {
   constructor (value = null, pointer = '/', visitor) {
     this.node = { pointer, value };
     this.visitor = visitor;
@@ -586,7 +586,6 @@ function * keysOf (node) {
   const keys = node.value !== null && typeof node.value === 'object'
     ? Object.keys(node.value)
     : [];
-
   for (const key of keys) {
     yield { pointer: `${node.pointer}${endSlash}${key}`, value: key };
   }
@@ -606,20 +605,31 @@ function * filter (iterable, predicate) {
   }
 }
 
-function * traverse (node) {
-  const { descendants } = yield node;
-  yield * map(descendants, (key) => traverse({ pointer: key.pointer, value: node.value[key.value] }));
+export async function * reduce (iterable, reducer, accumulator) {
+  for await (const item of iterable) {
+    const reductionResult = reducer(item, accumulator);
+    accumulator = reductionResult;
+    yield reductionResult;
+  }
 }
 
-const co = (genFunc, predicate, ...args) => {
-  const genObj = genFunc(...args);
-  step(genObj.next());
+export function * traverse (node) {
+  const { descendants } = yield node;
+  yield * map(descendants, (key) => traverse({ pointer: key.pointer, value: node.value[key.value] }), 0);
+  delete node.descendants;
+}
 
-  function step ({ value, done }) {
+export function * co (genFunc, stepPredicate, valuePredicate, ...args) {
+  const genObj = genFunc(...args);
+  yield * step(genObj.next());
+
+  function * step ({ value, done }) {
     if (!done) {
-      // console.log('result', value);
-      value.descendants = filter(keysOf(value), predicate);
-      step(genObj.next(value));
+      if (valuePredicate(value)) {
+        yield value;
+      }
+      value.descendants = typeof stepPredicate === 'function' ? filter(keysOf(value), stepPredicate) : keysOf(value);
+      yield * step(genObj.next(value));
     }
   }
 };
@@ -628,7 +638,7 @@ const co = (genFunc, predicate, ...args) => {
  * Clear all null values in an object, and clear resulting empty ancestors as well
  * @param  {Object} objectToClear An hierarchical object to clean null values for
  */
-const clearNullPointersAndAncestors = (objectToClear) => {
+export const clearNullPointersAndAncestors = (objectToClear) => {
   const nullPointers = [];
   getJsonPointers(objectToClear, (field) => field === null, nullPointers);
   nullPointers.reverse(); // handle high (array-)indices first
@@ -643,7 +653,7 @@ const clearNullPointersAndAncestors = (objectToClear) => {
  * Clear all empty values in an object, and clear resulting empty ancestors as well
  * @param  {Object} objectToClear An hierarchical object to clean null values for
  */
-const clearEmptyPointersAndAncestors = (objectToClear) => {
+export const clearEmptyPointersAndAncestors = (objectToClear) => {
   const emptyPointers = [];
   getJsonPointers(objectToClear, (field) => isEmptyStructure(field), emptyPointers);
   emptyPointers.reverse(); // handle high (array-)indices first
@@ -678,7 +688,7 @@ const removeNestedProperty = (containingObject, pathParts) => {
  * @param {Object} feature The geojson feature to test
  * @returns {Boolean} True when the feature properties are valid and present, false otherwise
  */
-const isFeatureGeoJsonComplete = (feature) => {
+export const isFeatureGeoJsonComplete = (feature) => {
   if (!isObject(feature) || !isObject(feature.properties)) {
     return false;
   }
@@ -709,19 +719,19 @@ const isFeatureGeoJsonComplete = (feature) => {
   }
 };
 
-module.exports = {
-  getJsonPointers: getJsonPointers,
-  clearRecursive: clearRecursive,
-  safeMerge: safeMerge,
-  clearNullPointersAndAncestors: clearNullPointersAndAncestors,
-  clearEmptyPointersAndAncestors: clearEmptyPointersAndAncestors,
-  removeNestedProperty: removeNestedProperty,
-  isFeatureGeoJsonComplete: isFeatureGeoJsonComplete,
-  isObject: isObject,
-  Traverser: Traverser,
-  Visitor: Visitor,
-  traverse: traverse,
-  co: co,
-  MODES_GEO_SELECTION: MODES_GEO_SELECTION,
-  MODES_GEO_MAPPING: MODES_GEO_MAPPING
-};
+// module.exports = {
+//   getJsonPointers: getJsonPointers,
+//   clearRecursive: clearRecursive,
+//   safeMerge: safeMerge,
+//   clearNullPointersAndAncestors: clearNullPointersAndAncestors,
+//   clearEmptyPointersAndAncestors: clearEmptyPointersAndAncestors,
+//   removeNestedProperty: removeNestedProperty,
+//   isFeatureGeoJsonComplete: isFeatureGeoJsonComplete,
+//   isObject: isObject,
+//   Traverser: Traverser,
+//   Visitor: Visitor,
+//   traverse: traverse,
+//   co: co,
+//   MODES_GEO_SELECTION: MODES_GEO_SELECTION,
+//   MODES_GEO_MAPPING: MODES_GEO_MAPPING
+// };
