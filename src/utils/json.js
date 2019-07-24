@@ -1,3 +1,5 @@
+'use strict';
+
 import produce from 'immer';
 import getNestedProperty from 'lodash.get';
 import setNestedProperty from 'lodash.set';
@@ -581,8 +583,10 @@ export class Traverser {
   }
 }
 
+const endsWith = String.prototype.endsWith;
+
 function * keysOf (node) {
-  const endSlash = node.pointer.endsWith('/') ? '' : '/';
+  const endSlash = endsWith.call(node.pointer, '/') ? '' : '/';
   const keys = node.value !== null && typeof node.value === 'object'
     ? Object.keys(node.value)
     : [];
@@ -616,11 +620,10 @@ export async function * reduce (iterable, reducer, accumulator) {
 export function * traverse (node) {
   const { descendants } = yield node;
   yield * map(descendants, (key) => traverse({ pointer: key.pointer, value: node.value[key.value] }), 0);
-  delete node.descendants;
 }
 
-export function * co (genFunc, stepPredicate, valuePredicate, ...args) {
-  const genObj = genFunc(...args);
+export function * co (genFunc, stepPredicate, valuePredicate, node) {
+  const genObj = genFunc(node);
   yield * step(genObj.next());
 
   function * step ({ value, done }) {
@@ -632,6 +635,78 @@ export function * co (genFunc, stepPredicate, valuePredicate, ...args) {
       yield * step(genObj.next(value));
     }
   }
+};
+
+class List {
+  constructor (x, xs) {
+    this.head = null;
+    this.tail = null;
+    this.head = () => x;
+    this.tail = () => xs;
+  }
+  [Symbol.iterator] () {
+    const listIterator = function * (xs) {
+      do {
+        yield head(xs);
+        xs = tail(xs);
+      } while (xs !== emptyList);
+    };
+    const gen = listIterator(this);
+    return {
+      next () { return gen.next(); }
+    };
+  }
+}
+
+const emptyList = new List();
+
+const isEmpty = xs => xs === emptyList;
+
+export const list = (...as) =>
+  as.length === 0 ? emptyList : new List(as.shift(), list(...as));
+
+const head = xs => {
+  if (isEmpty(xs)) { throw Error('EmptyListError'); }
+  return xs.head();
+};
+
+const tail = xs => {
+  if (isEmpty(xs)) { throw Error('EmptyListError'); }
+  return xs.tail();
+};
+
+export const index = (as, n) => {
+  if (n < 0 || isEmpty(as)) { throw Error('OutOfRangeError'); }
+  const x = head(as);
+  const xs = tail(as);
+  if (n === 0) { return x; }
+  return index(xs, n - 1);
+};
+
+export const cycle = as => {
+  if (isEmpty(as)) { throw Error('EmptyListError'); }
+  let x = head(as);
+  let xs = tail(as);
+  const c = list(x);
+  const listGenerator = function * () {
+    do {
+      x = isEmpty(xs) ? head(as) : head(xs);
+      xs = isEmpty(xs) ? tail(as) : tail(xs);
+      yield list(x);
+    } while (true);
+  };
+  const gen = listGenerator();
+  const handler = {
+    get: function (target, prop) {
+      if (prop === `tail` && isEmpty(tail(target))) {
+        const next = gen.next();
+        target[prop] = () => new Proxy(next.value, handler);
+      }
+      return target[prop];
+    }
+  };
+  const proxy = new Proxy(c, handler);
+  return proxy;
 };
 
 /**
@@ -718,20 +793,3 @@ export const isFeatureGeoJsonComplete = (feature) => {
       return false;
   }
 };
-
-// module.exports = {
-//   getJsonPointers: getJsonPointers,
-//   clearRecursive: clearRecursive,
-//   safeMerge: safeMerge,
-//   clearNullPointersAndAncestors: clearNullPointersAndAncestors,
-//   clearEmptyPointersAndAncestors: clearEmptyPointersAndAncestors,
-//   removeNestedProperty: removeNestedProperty,
-//   isFeatureGeoJsonComplete: isFeatureGeoJsonComplete,
-//   isObject: isObject,
-//   Traverser: Traverser,
-//   Visitor: Visitor,
-//   traverse: traverse,
-//   co: co,
-//   MODES_GEO_SELECTION: MODES_GEO_SELECTION,
-//   MODES_GEO_MAPPING: MODES_GEO_MAPPING
-// };

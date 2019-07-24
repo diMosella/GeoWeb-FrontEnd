@@ -1,5 +1,7 @@
+'use strict';
+
 import { performance } from 'perf_hooks';
-import { getJsonPointers, Traverser, Visitor, traverse, co } from './json.js';
+import { getJsonPointers, Traverser, Visitor, traverse, co, cycle, list, index } from './json.js';
 import get from 'lodash.get';
 // import * as testfile1 from '../../test/Taf_valid.json';
 // import testfile2 from '../../test/taf.json';
@@ -129,17 +131,18 @@ const testStreamingTraverse2 = (count) => {
   console.log('Result Streaming', visitor.next());
   let next = 0;
   let stop = false;
-  while (next < 24 && stop === false) {
-    const t1 = performance.now();
+  while (next < 22 && stop === false) {
+    // const t1 = performance.now();
     const { value, done } = visitor.next();
     if (!done) {
       console.log(value.pointer);
     }
-    const t2 = performance.now();
-    console.log('Next timing', (t2 - t1));
+    // const t2 = performance.now();
+    // console.log('Next timing', (t2 - t1));
     next++;
     stop = done;
   }
+
   //
   // const t3 = performance.now();
   // console.log(visitor.next().value.pointer);
@@ -162,10 +165,25 @@ const testLodash = (count) => {
   console.log('Result lodash', get(testfile3, pointer.split('/')));
 };
 
-testGetJsonPointers(1000);
-testGetJsonPointers2(1000);
-testTraverser(1000);
-testTraverserUpdate(1000);
-testStreamingTraverse(1000);
-testStreamingTraverse2(1000);
-testLodash(1000);
+const testCycle = (count) => {
+  let lst4 = cycle(list(5, 4, 3, 2, 1));
+  console.log(index(lst4, 5)); // 5
+  // console.log(index(lst4, 10003)); // 5 -> call stack exceeded
+  let counter = 0;
+  for (const test of lst4) {
+    console.log(test);
+    counter++;
+    if (counter > 300) {
+      break;
+    }
+  }
+};
+
+testGetJsonPointers(10);
+testGetJsonPointers2(10);
+testTraverser(10);
+testTraverserUpdate(10);
+testStreamingTraverse(10);
+testStreamingTraverse2(10);
+testLodash(10);
+testCycle(10);
